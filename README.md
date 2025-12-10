@@ -168,7 +168,7 @@ Asynchronous method for making requests to the Bitrix24 REST API.
 - Similar to the `BX24.callMethod` method, but returns a Promise
 - Usage: `const response = await api().methods.b24Call('method.name', params)`
 - Doesn't require a callback parameter, simplifying asynchronous code
-- Documentation: [BX24.callMethod](https://apidocs.bitrix24.com/api-reference/bx24-js-sdk/how-to-call-rest-methods/bx24-call-method.html)
+- Documentation: [BX24.callMethod](https://apidocs.bitrix24.com/sdk/bx24-js-sdk/how-to-call-rest-methods/bx24-call-method.html)
 
 #### api().methods.axios
 Standard Axios plugin (version 1.11.0) for making HTTP requests.
@@ -331,4 +331,3 @@ export default {
 
 - [Official Bitrix24 REST API Documentation](https://apidocs.bitrix24.com/api-reference/)
 - [Documentation on Widgets and UI Interaction](https://apidocs.bitrix24.com/api-reference/widgets/)
-- [BX24 JS SDK Documentation](https://apidocs.bitrix24.com/api-reference/bx24-js-sdk/)
