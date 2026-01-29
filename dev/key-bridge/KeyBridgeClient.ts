@@ -469,13 +469,24 @@ class KeyBridgeClient {
      * Parses request execution result
      * @param result - Result from server
      */
-    private parseResult(result: unknown): unknown {
+     private parseResult(result: unknown): unknown {
         if (typeof result === 'string') {
             try {
-                return JSON.parse(result);
+                const parsed = JSON.parse(result);
+                if (parsed && typeof parsed === 'object' && parsed.result !== undefined) {
+                    return parsed.result;
+                }
+                return parsed;
             } catch {
                 return result;
             }
+        }
+        if (result && typeof result === 'object') {
+            const obj = result as Record<string, unknown>;
+            if (obj.method !== undefined && obj.result !== undefined) {
+                return obj.result;
+            }
+            return result;
         }
         return result;
     }
