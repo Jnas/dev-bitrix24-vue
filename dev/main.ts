@@ -46,6 +46,14 @@ export async function initApp(container: string | Element = '#appMount') {
 
         if (import.meta.env.DEV) {
             await setupDevTools(app)
+
+            const savedKey = localStorage.getItem('keybridge_connection_key');
+            if (savedKey) {
+                try {
+                    await keyBridgeClient.setKey(savedKey);
+                } catch {
+                }
+            }
         }
 
         app.mount(resolveContainer(container))
