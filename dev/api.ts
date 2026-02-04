@@ -1,6 +1,6 @@
 ﻿// /dev/api.ts
-import { loadMockData, type MockDataType, areParamsEqual } from './mockDataLoader.ts';
-import { keyBridgeClient } from './key-bridge/KeyBridgeClient.ts';
+import {areParamsEqual, loadMockData, type MockDataType} from './mockDataLoader.ts';
+import {keyBridgeClient} from './key-bridge/KeyBridgeClient.ts';
 
 interface ToastMethods {
     success: (message: string, options?: unknown) => void;
@@ -13,13 +13,17 @@ interface ToastMethods {
 
 interface AxiosMethods {
     get<T = unknown>(url: string, config?: unknown): Promise<T>;
+
     post<T = unknown>(url: string, data?: unknown, config?: unknown): Promise<T>;
+
     put<T = unknown>(url: string, data?: unknown, config?: unknown): Promise<T>;
+
     delete<T = unknown>(url: string, config?: unknown): Promise<T>;
 }
 
 interface ApiMethods {
     b24Call: <T = unknown>(method: string, params?: unknown) => Promise<T>;
+    b24Auth: <T = unknown>() => Promise<T>;
     toast: ToastMethods;
     axios: AxiosMethods;
     openCustomScript: (...args: unknown[]) => void;
@@ -53,10 +57,10 @@ const getMockData = (): MockDataType => {
             console.warn('[API] Failed to load mock data');
         }
     }
-    return { latestFields: { placement: null }, methodMocks: [] };
+    return {latestFields: {placement: null}, methodMocks: []};
 };
 
-const { latestFields, methodMocks } = getMockData();
+const {latestFields, methodMocks} = getMockData();
 
 const findMock = async <T = unknown>(
     method: string,
@@ -87,7 +91,7 @@ const findMock = async <T = unknown>(
             'color: #1A1A1A; background: #faf9f0; font-weight: bold', // "  Parameters: "
             'color: #1976D2; background: #faf9f0; white-space: pre; cursor: text' // Parameter values
         );
-        return { result: [] } as T;
+        return {result: []} as T;
     }
 
     if (mock.delay) {
@@ -107,8 +111,29 @@ const createDevApi = (): ApiObjectType => {
         methods: {
             b24Call: async <T = unknown>(method: string, params?: unknown): Promise<T> => {
                 return keyBridgeClient.executeOrFallback<T>(
-                    { method: 'b24Call', params: [method, params] },
+                    {method: 'b24Call', params: [method, params]},
                     () => findMock<T>(method, params)
+                );
+            },
+            b24Auth: async <T = unknown>(): Promise<T> => {
+                return keyBridgeClient.executeOrFallback<T>(
+                    {method: 'b24Auth'},
+                    async () => {
+                        console.log(
+                            '%c[b24Auth]📥 Not implemented in non-KeyBridge mode. Returning stub.',
+                            'color: #D35400; background: #FDF5E6; padding: 2px 5px; border-radius: 3px; font-weight: bold; border-left: 2px solid #F39C12;'
+                        );
+
+                        const mock = methodMocks.find(m => m.method === 'b24Auth');
+                        if (mock) {
+                            if (mock.delay) {
+                                await new Promise(resolve => setTimeout(resolve, mock.delay));
+                            }
+                            return mock.result as T;
+                        }
+                        // If no mock, return empty object of the required type
+                        return {} as T;
+                    }
                 );
             },
             toast: window.Toast ?? ({} as ToastMethods),
@@ -127,7 +152,7 @@ const createDevApi = (): ApiObjectType => {
                 ;
             }
         },
-        fields: latestFields === null ? { placement: null } : latestFields
+        fields: latestFields === null ? {placement: null} : latestFields
     };
 };
 
